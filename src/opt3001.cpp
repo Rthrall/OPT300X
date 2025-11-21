@@ -1,9 +1,6 @@
 /* Self header */
 #include "opt3001.h"
 
-/* Arduino libraries */
-#include <Wire.h>
-
 /**
  * Reads the contents of the given register.
  * @param[in] reg_address The address of the register.
