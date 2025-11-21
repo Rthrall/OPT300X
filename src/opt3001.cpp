@@ -24,7 +24,7 @@ int opt3001::register_read(const enum opt3001_register reg_address, uint16_t *co
     }
 
     /* Read data */
-    m_i2c_library->requestFrom(m_i2c_address, (uint8_t)2, (uint8_t) true);
+    m_i2c_library->requestFrom(m_i2c_address, (uint8_t)2, (uint8_t)true);
     res = m_i2c_library->available();
     if (res == 0) {
         return -EIO;
@@ -66,10 +66,15 @@ int opt3001::register_write(const enum opt3001_register reg_address, const uint1
 }
 
 /**
+ * Initialize the OPT3001 sensor with I2C communication parameters
  *
- * @param[in] i2c_library
- * @param[in] i2c_address
- * @return 0 in case of success, or a negative error code otherwise.
+ * Validates the I2C address format and stores the communication parameters
+ * for subsequent operations. The I2C address must match the pattern 0b01000100
+ * in the upper 6 bits (addresses 0x44, 0x45, 0x46, 0x47 are valid).
+ *
+ * @param[in] i2c_library Reference to the TwoWire I2C library instance to use
+ * @param[in] i2c_address I2C address of the OPT3001 sensor (must match 0b01000100 pattern)
+ * @return 0 on success, -EINVAL if the I2C address format is invalid
  */
 int opt3001::setup(TwoWire &i2c_library, const uint8_t i2c_address) {
 
@@ -87,8 +92,14 @@ int opt3001::setup(TwoWire &i2c_library, const uint8_t i2c_address) {
 }
 
 /**
+ * Detect and verify the presence of an OPT3001 sensor
  *
- * @return 0 if a valid device was found, or a negative error code otherwise.
+ * Reads the manufacturer ID and device ID registers to verify that a valid
+ * OPT3001 sensor is connected at the configured I2C address. The manufacturer
+ * ID should be 0x5449 (Texas Instruments) and the device ID should be 0x3001.
+ *
+ * @return 0 if a valid OPT3001 device is detected, -EIO on I2C communication
+ *         failure, or -1 if the device IDs do not match expected values
  */
 int opt3001::detect(void) {
     int res;
@@ -118,7 +129,15 @@ int opt3001::detect(void) {
 }
 
 /**
- * 
+ * Configure the sensor conversion time and enable automatic full-scale range
+ *
+ * Sets the conversion time (100ms or 800ms) and enables automatic full-scale
+ * range selection. With automatic full-scale enabled, the sensor automatically
+ * selects the optimal measurement range for the current light conditions.
+ *
+ * @param[in] ct Conversion time setting (OPT3001_CONVERSION_TIME_100MS or
+ *                OPT3001_CONVERSION_TIME_800MS)
+ * @return 0 on success, -EIO on I2C communication failure
  */
 int opt3001::config_set(const enum opt3001_conversion_time ct) {
     int res;
@@ -140,7 +159,14 @@ int opt3001::config_set(const enum opt3001_conversion_time ct) {
 }
 
 /**
- * 
+ * Enable continuous conversion mode
+ *
+ * Configures the sensor to continuously perform conversions and update the
+ * result register. The sensor will automatically start a new conversion after
+ * completing the previous one. This mode provides the fastest update rate but
+ * consumes more power than single-shot mode.
+ *
+ * @return 0 on success, -EIO on I2C communication failure
  */
 int opt3001::conversion_continuous_enable(void) {
     int res;
@@ -159,7 +185,14 @@ int opt3001::conversion_continuous_enable(void) {
 }
 
 /**
- * 
+ * Disable continuous conversion mode (enter shutdown mode)
+ *
+ * Places the sensor in low-power shutdown state. In this mode, the sensor
+ * stops performing conversions and consumes minimal power. Use this mode to
+ * save power when measurements are not needed, or before triggering a
+ * single-shot conversion.
+ *
+ * @return 0 on success, -EIO on I2C communication failure
  */
 int opt3001::conversion_continuous_disable(void) {
     int res;
@@ -178,7 +211,15 @@ int opt3001::conversion_continuous_disable(void) {
 }
 
 /**
- * 
+ * Trigger a single-shot conversion
+ *
+ * Initiates one conversion cycle. After the conversion completes (based on
+ * the configured conversion time), the sensor automatically returns to
+ * shutdown mode. This is useful for power-sensitive applications where
+ * periodic measurements are sufficient. Use lux_read() after waiting for the
+ * conversion time to read the result.
+ *
+ * @return 0 on success, -EIO on I2C communication failure
  */
 int opt3001::conversion_singleshot_trigger(void) {
     int res;
@@ -197,9 +238,21 @@ int opt3001::conversion_singleshot_trigger(void) {
 }
 
 /**
+ * Read the current illuminance measurement in lux
  *
- * @param[out] lux
- * @return 0 in case of success, or a negative error code otherwise.
+ * Reads the result register and converts the raw sensor data to illuminance
+ * in lux. The OPT3001 uses a mantissa-exponent format where the 12-bit
+ * mantissa (bits 0-11) is multiplied by 0.01 * 2^exponent, where the
+ * exponent is stored in bits 12-15. This provides a wide dynamic range
+ * from 0.01 lux to 83,000 lux.
+ *
+ * Note: Ensure a conversion has completed before calling this function.
+ * In single-shot mode, wait for the conversion time after triggering.
+ * In continuous mode, the result is updated automatically.
+ *
+ * @param[out] lux Pointer to float variable that will receive the illuminance
+ *                 value in lux
+ * @return 0 on success, -EIO on I2C communication failure
  */
 int opt3001::lux_read(float *const lux) {
     int res;
