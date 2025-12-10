@@ -1,4 +1,4 @@
-opt3001	KEYWORD1
+opt300X	KEYWORD1
 register_read	KEYWORD2
 register_write	KEYWORD2
 setup	KEYWORD2
