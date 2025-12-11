@@ -116,7 +116,7 @@ int opt300x::detect(void) {
 
     /* Ensure device id is as expected */
     uint16_t reg_device_id = 0x0000;
-    res = register_read(OPT300X_REGISTER_DEVIID, &reg_device_id);
+    res = register_read(OPT300x_REGISTER_DEVIID, &reg_device_id);
     if (res < 0) {
         return -EIO;
     }
