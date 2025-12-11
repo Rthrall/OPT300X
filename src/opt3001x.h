@@ -105,6 +105,7 @@ class opt300x {
      * @return 0 on success, negative error code on I2C communication failure
      */
     int isready(void);
+    int get_lux(void);
 
    protected:
     TwoWire *m_i2c_library = NULL;
