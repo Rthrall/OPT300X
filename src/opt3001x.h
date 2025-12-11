@@ -10,7 +10,7 @@
 #include <stdint.h>
 
 /**
- * OPT300X register addresses
+ * OPT300x register addresses
  */
 enum opt300x_register {
     OPT300x_REGISTER_RESULT = 0x00,
@@ -22,7 +22,7 @@ enum opt300x_register {
 };
 
 /**
- * OPT300X conversion time options
+ * OPT300x conversion time options
  */
 enum opt300x_conversion_time {
     OPT300x_CONVERSION_TIME_100MS,  ///< 100ms conversion time
@@ -30,26 +30,26 @@ enum opt300x_conversion_time {
 };
 
 /**
- * OPT300X ambient light sensor driver class
+ * OPT300x ambient light sensor driver class
  *
  * This class provides an interface to communicate with the Texas Instruments
- * OPT300X ambient light sensor via I2C. The sensor measures illuminance in lux
+ * OPT300x ambient light sensor via I2C. The sensor measures illuminance in lux
  * with a wide dynamic range and automatic full-scale setting.
  */
 class opt300x {
    public:
     /**
-     * Initialize the OPT300X sensor with I2C communication parameters
+     * Initialize the OPT300x sensor with I2C communication parameters
      * @param[in] i2c_library Reference to the TwoWire I2C library instance to use
-     * @param[in] i2c_address I2C address of the OPT300X sensor (must match 0b01000100 pattern)
+     * @param[in] i2c_address I2C address of the OPT300x sensor (must match 0b01000100 pattern)
      * @return 0 on success, negative error code on failure (-EINVAL for invalid address)
      */
-    int setup(TwoWire& i2c_library, const uint8_t i2c_address);
+    int setup(TwoWire &i2c_library, const uint8_t i2c_address);
 
     /**
-     * Detect and verify the presence of an OPT300X sensor
+     * Detect and verify the presence of an OPT300x sensor
      * Reads and validates the manufacturer ID (0x5449) and device ID (0x3001)
-     * @return 0 if a valid OPT300X device is detected, negative error code otherwise
+     * @return 0 if a valid OPT300x device is detected, negative error code otherwise
      */
     int detect(void);
 
@@ -82,15 +82,15 @@ class opt300x {
     int conversion_singleshot_trigger(void);
 
     /**
-     * Read a 16-bit register from the OPT300X sensor
+     * Read a 16-bit register from the OPT300x sensor
      * @param[in] reg_address Register address to read from
      * @param[out] reg_content Pointer to variable that will receive the register value
      * @return 0 on success, negative error code on failure (-EINVAL if not initialized, -EIO on I2C error)
      */
-    int register_read(const enum opt300x_register reg_address, uint16_t* const reg_content);
+    int register_read(const enum opt300x_register reg_address, uint16_t *const reg_content);
 
     /**
-     * Write a 16-bit value to an OPT300X register
+     * Write a 16-bit value to an OPT300x register
      * @param[in] reg_address Register address to write to
      * @param[in] reg_content 16-bit value to write to the register
      * @return 0 on success, negative error code on failure (-EINVAL if not initialized, -EIO on I2C error)
@@ -100,14 +100,14 @@ class opt300x {
     /**
      * Read the current illuminance measurement in lux
      * Reads the result register and converts the raw sensor data to lux using the
-     * mantissa and exponent format specified in the OPT300X datasheet
+     * mantissa and exponent format specified in the OPT300x datasheet
      * @param[out] lux Pointer to float variable that will receive the illuminance value in lux
      * @return 0 on success, negative error code on I2C communication failure
      */
-    int lux_read(float* const lux);
+    int lux_read(float *const lux);
 
    protected:
-    TwoWire* m_i2c_library = NULL;
+    TwoWire *m_i2c_library = NULL;
     uint8_t m_i2c_address;
 };
 
