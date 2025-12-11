@@ -104,7 +104,7 @@ class opt300x {
      * @param[out] lux Pointer to float variable that will receive the illuminance value in lux
      * @return 0 on success, negative error code on I2C communication failure
      */
-    int lux_read(float *const lux);
+    int isready(void);
 
    protected:
     TwoWire *m_i2c_library = NULL;
