@@ -7,7 +7,7 @@
  * @param[out] reg_content A pointer to a variable that will be updated with the contents of the register.
  * @return 0 in case of success, or a negative error code otherwise.
  */
-int opt300x::register_read(const enum opt300x_register reg_address, uint16_t* const reg_content) {
+int opt300x::register_read(const enum opt300x_register reg_address, uint16_t *const reg_content) {
     int res;
 
     /* Ensure library has been configured */
@@ -66,17 +66,17 @@ int opt300x::register_write(const enum opt300x_register reg_address, const uint1
 }
 
 /**
- * Initialize the OPT300X sensor with I2C communication parameters
+ * Initialize the OPT300x sensor with I2C communication parameters
  *
  * Validates the I2C address format and stores the communication parameters
  * for subsequent operations. The I2C address must match the pattern 0b01000100
  * in the upper 6 bits (addresses 0x44, 0x45, 0x46, 0x47 are valid).
  *
  * @param[in] i2c_library Reference to the TwoWire I2C library instance to use
- * @param[in] i2c_address I2C address of the OPT300X sensor (must match 0b01000100 pattern)
+ * @param[in] i2c_address I2C address of the OPT300x sensor (must match 0b01000100 pattern)
  * @return 0 on success, -EINVAL if the I2C address format is invalid
  */
-int opt300x::setup(TwoWire& i2c_library, const uint8_t i2c_address) {
+int opt300x::setup(TwoWire &i2c_library, const uint8_t i2c_address) {
 
     /* Ensure i2c address is valid */
     if ((i2c_address & 0b11111100) != 0b01000100) {
@@ -92,13 +92,13 @@ int opt300x::setup(TwoWire& i2c_library, const uint8_t i2c_address) {
 }
 
 /**
- * Detect and verify the presence of an OPT300X sensor
+ * Detect and verify the presence of an OPT300x sensor
  *
  * Reads the manufacturer ID and device ID registers to verify that a valid
- * OPT300X sensor is connected at the configured I2C address. The manufacturer
+ * OPT300x sensor is connected at the configured I2C address. The manufacturer
  * ID should be 0x5449 (Texas Instruments) and the device ID should be 0x3001.
  *
- * @return 0 if a valid OPT300X device is detected, -EIO on I2C communication
+ * @return 0 if a valid OPT300x device is detected, -EIO on I2C communication
  *         failure, or -1 if the device IDs do not match expected values
  */
 int opt300x::detect(void) {
@@ -106,7 +106,7 @@ int opt300x::detect(void) {
 
     /* Ensure manufacturer id is as expected */
     uint16_t reg_manufacturer_id = 0x0000;
-    res = register_read(OPT300X_REGISTER_MANUID, &reg_manufacturer_id);
+    res = register_read(OPT300x_REGISTER_MANUID, &reg_manufacturer_id);
     if (res < 0) {
         return -EIO;
     }
@@ -135,8 +135,8 @@ int opt300x::detect(void) {
  * range selection. With automatic full-scale enabled, the sensor automatically
  * selects the optimal measurement range for the current light conditions.
  *
- * @param[in] ct Conversion time setting (OPT300X_CONVERSION_TIME_100MS or
- *                OPT300X_CONVERSION_TIME_800MS)
+ * @param[in] ct Conversion time setting (OPT300x_CONVERSION_TIME_100MS or
+ *                OPT300x_CONVERSION_TIME_800MS)
  * @return 0 on success, -EIO on I2C communication failure
  */
 int opt300x::config_set(const enum opt300x_conversion_time ct) {
@@ -145,13 +145,13 @@ int opt300x::config_set(const enum opt300x_conversion_time ct) {
     /* Enable automatic full scale
      * Set conversion time */
     uint16_t reg_config;
-    res = register_read(OPT300X_REGISTER_CONFIG, &reg_config);
+    res = register_read(OPT300x_REGISTER_CONFIG, &reg_config);
     if (res < 0) return -EIO;
     reg_config &= ~(0b1111 << 12);
     reg_config |= 0b1100 << 12;
     reg_config &= ~(0b1 << 11);
-    reg_config |= (ct == OPT300X_CONVERSION_TIME_800MS) ? 0b1 : 0b0;
-    res = register_write(OPT300X_REGISTER_CONFIG, reg_config);
+    reg_config |= (ct == OPT300x_CONVERSION_TIME_800MS) ? 0b1 : 0b0;
+    res = register_write(OPT300x_REGISTER_CONFIG, reg_config);
     if (res < 0) return -EIO;
 
     /* Return success */
@@ -173,11 +173,11 @@ int opt300x::conversion_continuous_enable(void) {
 
     /* Set continuous conversion mode */
     uint16_t reg_config;
-    res = register_read(OPT300X_REGISTER_CONFIG, &reg_config);
+    res = register_read(OPT300x_REGISTER_CONFIG, &reg_config);
     if (res < 0) return -EIO;
     reg_config &= ~(0b11 << 9);
     reg_config |= (0b11 << 9);
-    res = register_write(OPT300X_REGISTER_CONFIG, reg_config);
+    res = register_write(OPT300x_REGISTER_CONFIG, reg_config);
     if (res < 0) return -EIO;
 
     /* Return success */
@@ -199,11 +199,11 @@ int opt300x::conversion_continuous_disable(void) {
 
     /* Set shutdown conversion mode */
     uint16_t reg_config;
-    res = register_read(OPT300X_REGISTER_CONFIG, &reg_config);
+    res = register_read(OPT300x_REGISTER_CONFIG, &reg_config);
     if (res < 0) return -EIO;
     reg_config &= ~(0b11 << 9);
     reg_config |= (0b00 << 9);
-    res = register_write(OPT300X_REGISTER_CONFIG, reg_config);
+    res = register_write(OPT300x_REGISTER_CONFIG, reg_config);
     if (res < 0) return -EIO;
 
     /* Return success */
@@ -226,11 +226,11 @@ int opt300x::conversion_singleshot_trigger(void) {
 
     /* Set single-shot conversion mode */
     uint16_t reg_config;
-    res = register_read(OPT300X_REGISTER_CONFIG, &reg_config);
+    res = register_read(OPT300x_REGISTER_CONFIG, &reg_config);
     if (res < 0) return -EIO;
     reg_config &= ~(0b11 << 9);
     reg_config |= (0b01 << 9);
-    res = register_write(OPT300X_REGISTER_CONFIG, reg_config);
+    res = register_write(OPT300x_REGISTER_CONFIG, reg_config);
     if (res < 0) return -EIO;
 
     /* Return success */
@@ -241,7 +241,7 @@ int opt300x::conversion_singleshot_trigger(void) {
  * Read the current illuminance measurement in lux
  *
  * Reads the result register and converts the raw sensor data to illuminance
- * in lux. The OPT300X uses a mantissa-exponent format where the 12-bit
+ * in lux. The OPT300x uses a mantissa-exponent format where the 12-bit
  * mantissa (bits 0-11) is multiplied by 0.01 * 2^exponent, where the
  * exponent is stored in bits 12-15. This provides a wide dynamic range
  * from 0.01 lux to 83,000 lux.
@@ -254,7 +254,7 @@ int opt300x::conversion_singleshot_trigger(void) {
  *                 value in lux
  * @return 0 on success, -EIO on I2C communication failure
  */
-int opt300x::lux_read(float* const lux) {
+int opt300x::lux_read(float *const lux) {
     int res;
 
     /* Read result register */
