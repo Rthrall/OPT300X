@@ -1,6 +1,6 @@
 {
-    "name": "OPT300X_Arduino_Library",
-    "version": "0.1.0",
+    "name": "Weather_Station_OPT300X_Library",
+    "version": "0.2.0",
     "description": "Arduino library for the Texas Instruments OPT300X ambient light sensor.",
     "keywords": "arduino,library,texas instruments,ti,opt3001,ambient,light,sensor,i2c",
     "repository": {
