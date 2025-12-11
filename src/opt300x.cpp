@@ -254,7 +254,7 @@ int opt300x::conversion_singleshot_trigger(void) {
  *                 value in lux
  * @return 0 on success, -EIO on I2C communication failure
  */
-int opt300x::lux_read(float *const lux) {
+int opt300x::isready(void) {
     int res;
 
     /* Read result register */
@@ -262,17 +262,20 @@ int opt300x::lux_read(float *const lux) {
     res = register_read(OPT300x_REGISTER_RESULT, &reg_result);
     if (res < 0) {
         return -EIO;
+    } else {
+        return 0;
     }
+}
 
-    /* Convert to float */
-#if 0
-    *lux = (float)(reg_result);
-#else
+int opt300x::get_lux(void) 
+{   
+    uint16_t reg_result = 0x0000;
+    uint16_t raw = register_read(OPT300x_REGISTER_RESULT, &reg_result);
+    float flux = (float)(reg_result);
     uint16_t mantissa = reg_result & 0x0FFF;
     uint16_t exponent = (reg_result & 0xF000) >> 12;
-    *lux = mantissa * (0.01 * pow(2, exponent));
-#endif
+    flux = mantissa * (0.01 * pow(2, exponent));
+    int lux = (int)flux;
+    return lux;
 
-    /* Return success */
-    return 0;
 }
