@@ -259,7 +259,7 @@ int opt300x::lux_read(float* const lux) {
 
     /* Read result register */
     uint16_t reg_result = 0x0000;
-    res = register_read(OPT300X_REGISTER_RESULT, &reg_result);
+    res = register_read(OPT300x_REGISTER_RESULT, &reg_result);
     if (res < 0) {
         return -EIO;
     }
